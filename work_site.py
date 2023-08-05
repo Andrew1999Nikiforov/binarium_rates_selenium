@@ -13,7 +13,7 @@ def change_real_money_to_game(driver): # Перевод счета с реаль
     except TimeoutException:
         print("Кнопка для перевода счета с реального на игровой не найдена за отведенное время.")
 
-def is_time_difference_greater_than_5_minutes(time_str1, time_str2): # сравнение двух времени 
+def is_time_difference_greater_than_5_minutes(time_str1, time_str2): # сравнение двух времени больше 5 минут или меньше
     time_format = '%H:%M'
     time1 = datetime.strptime(time_str1, time_format)
     time2 = datetime.strptime(time_str2, time_format)
@@ -33,7 +33,7 @@ def change_active_money(driver): # выбор активов слева свер
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
         input_active.send_keys("LATAM")
         time.sleep(1)
-        if change_long_or_short_active("21:20"):
+        if change_long_or_short_active("21:40"):
             elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
             second_element = elements[1]
             second_element.click()
@@ -42,10 +42,13 @@ def change_active_money(driver): # выбор активов слева свер
     except TimeoutException:
         print("Кнопка для выбора % денег не найдена за отведенное время.")
 
-def change_time(driver):
+def change_time(driver): # Установка времени 
     try:
         text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
-        while text_from_time < "21:20":
-            WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.t-expiration-spinners .spinners__button --inc'))).click()
+        while text_from_time < "21:40":
+            WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.t-expiration-spinners .spinners__button.--inc'))).click()
+            time.sleep(1)
+            text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
     except TimeoutException:
         print("Кнопка времени не найдена")
+
