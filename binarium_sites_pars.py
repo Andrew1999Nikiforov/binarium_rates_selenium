@@ -10,5 +10,5 @@ driver.get(url)
 
 login_site.login(driver)
 work_site.change_real_money_to_game(driver)
-
+work_site.change_active_money(driver)
 driver.quit()
