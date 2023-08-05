@@ -20,23 +20,25 @@ def is_time_difference_greater_than_5_minutes(time_str1, time_str2): # срав�
     time_diff_seconds = abs((time2 - time1).total_seconds())
     return time_diff_seconds > 5 * 60
 
-def change_long_or_short_active(): # выбор % в активах
+def change_long_or_short_active(time_sms): # выбор % в активах !!!!time_sms в формате 15:00 должно быть
     current_time = datetime.now().strftime('%H:%M')
-    if is_time_difference_greater_than_5_minutes(current_time, "20:41"):
+    if is_time_difference_greater_than_5_minutes(current_time, time_sms): #!!!time_sms в формате 15:00 должно быть
         return True
     else:
         return False
             
-change_long_or_short_active()
-
 def change_active_money(driver): # выбор активов слева сверху
     try:
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
-        input_active.send_keys("APPLE (OTC)")
+        input_active.send_keys("LATAM")
         time.sleep(1)
-        
-        WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, 'asset-profit__score'))).click()
+        if change_long_or_short_active("20:55"):
+            elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
+            second_element = elements[1]
+            second_element.click()
+        else:
+            WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, 'asset-profit__score'))).click()
         
     except TimeoutException:
         print("Кнопка для выбора денег не найдена за отведенное время.")
