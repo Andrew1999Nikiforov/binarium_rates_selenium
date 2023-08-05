@@ -33,7 +33,7 @@ def change_active_money(driver): # выбор активов слева свер
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
         input_active.send_keys("LATAM")
         time.sleep(1)
-        if change_long_or_short_active("21:40"):
+        if change_long_or_short_active("22:16"):
             elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
             second_element = elements[1]
             second_element.click()
@@ -45,10 +45,20 @@ def change_active_money(driver): # выбор активов слева свер
 def change_time(driver): # Установка времени 
     try:
         text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
-        while text_from_time < "21:40":
+        while text_from_time < "22:16":
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.t-expiration-spinners .spinners__button.--inc'))).click()
             time.sleep(1)
             text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
     except TimeoutException:
         print("Кнопка времени не найдена")
 
+def change_up_or_down(driver):
+    try:
+        time.sleep(5)
+        if "up":
+            WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--call'))).click()
+        else:
+            WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--put'))).click()
+        time.sleep(360)
+    except TimeoutException:
+        print("Кнопка времени не найдена")
