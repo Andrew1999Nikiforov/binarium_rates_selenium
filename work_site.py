@@ -26,19 +26,26 @@ def change_long_or_short_active(time_sms): # выбор % в активах !!!!
         return True
     else:
         return False
-            
+
 def change_active_money(driver): # выбор активов слева сверху
     try:
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
         input_active.send_keys("LATAM")
         time.sleep(1)
-        if change_long_or_short_active("20:55"):
+        if change_long_or_short_active("21:20"):
             elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
             second_element = elements[1]
             second_element.click()
         else:
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, 'asset-profit__score'))).click()
-        
     except TimeoutException:
-        print("Кнопка для выбора денег не найдена за отведенное время.")
+        print("Кнопка для выбора % денег не найдена за отведенное время.")
+
+def change_time(driver):
+    try:
+        text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
+        while text_from_time < "21:20":
+            WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.t-expiration-spinners .spinners__button --inc'))).click()
+    except TimeoutException:
+        print("Кнопка времени не найдена")
