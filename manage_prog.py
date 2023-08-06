@@ -9,7 +9,7 @@ def manage_programm_function(driver):
     login_site.login(driver)
     work_site.change_real_money_to_game(driver)
     work_site.close_banner(driver)
-
+    work_site.close_banner_cookie(driver)
     while True:
         work_site.start_program_y()
         if work_site.text_processing(password.param.text_sms):

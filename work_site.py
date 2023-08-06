@@ -49,10 +49,21 @@ def change_long_or_short_active(time_sms): # выбор % в активах !!!!
     else:
         return False
 
+def check_input_is_empty(driver): # Проверяем поле для ввода акций пустая она или нет, если нет, то опустошаем
+    try:
+       input_text = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]'))).get_attribute("value")
+       if input_text == "":
+            return True
+       else:
+            input_text.clear()
+    except TimeoutException:
+        print("Кнопка для ввода акций не найдена")
+
 def change_active_money(driver, active, time_t): # выбор активов слева сверху
     try:
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
+        input_active.clear()
         input_active.send_keys(active)
         time.sleep(1)
         if change_long_or_short_active(time_t):
@@ -67,6 +78,13 @@ def change_active_money(driver, active, time_t): # выбор активов с�
 def close_banner(driver): # Закрываем баннер с рекламой
     try:
         WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CLASS_NAME, '--color-light'))).click()
+    except TimeoutException:
+        print("Кнопка для закрытия банера не появилась")
+        pass
+
+def close_banner_cookie(driver): # Закрываем баннер с куки
+    try:
+        WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, "//button[text()='Хорошо']"))).click()
     except TimeoutException:
         print("Кнопка для закрытия банера не появилась")
         pass
