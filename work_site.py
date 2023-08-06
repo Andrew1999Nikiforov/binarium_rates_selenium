@@ -2,7 +2,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException 
+from selenium.common.exceptions import ElementClickInterceptedException
 from password import param
 import time
 from datetime import datetime
@@ -20,7 +21,8 @@ def start_program_y(): # Получаем строку из второй про�
         print("Сообщение от программы X:", param.text_sms)
 
 def text_processing(message): # Функция которая обрабатывает строку с канала
-    pattern = r'([A-Za-z]+)\s+(\d{2}:\d{2})\s+(вверх|вниз)'
+    # pattern = r'([A-Za-z]+)\s+(\d{2}:\d{2})\s+(вверх|вниз)'
+    pattern = r'^(\w+(?:\s\w+)?)\s(\d{1,2}:\d{2})\s(вверх|вниз)$'
     match = re.match(pattern, message)
     if match:
         param.active = match.group(1)
@@ -51,15 +53,15 @@ def change_long_or_short_active(time_sms): # выбор % в активах !!!!
     else:
         return False
 
-def check_input_is_empty(driver): # Проверяем поле для ввода акций пустая она или нет, если нет, то опустошаем
+def close_active_menu(driver): # Закрываем баннер с рекламой
     try:
-       input_text = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]'))).get_attribute("value")
-       if input_text == "":
-            return True
-       else:
-            input_text.clear()
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, '--color-dark'))).click()
     except TimeoutException:
-        print("Кнопка для ввода акций не найдена")
+        print("Кнопка для закрытия банера актив меню не появилась")
+    except NoSuchElementException:
+        print("Кнопка для закрытия банера актив меню не появилась")
+    except ElementClickInterceptedException:
+        print("Кнопка для закрытия банера актив меню не появилась")
 
 def change_active_money(driver, active, time_t): # выбор активов слева сверху
     try:
@@ -72,10 +74,14 @@ def change_active_money(driver, active, time_t): # выбор активов с�
             elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
             second_element = elements[1]
             second_element.click()
+            return True
         else:
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, 'asset-profit__score'))).click()
-    except TimeoutException:
+            return True
+    except ( TimeoutException, ElementClickInterceptedException, IndexError ):
         print("Кнопка для выбора % денег не найдена за отведенное время.")
+        close_active_menu(driver)
+        return False
 
 def close_banner(driver): # Закрываем баннер с рекламой
     try:
@@ -105,7 +111,7 @@ def change_time(driver, time_t): # Установка времени
             time.sleep(1)
             text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
     except TimeoutException:
-        print("Кнопка времени не найдена")
+        print("Кнопка для установки времени не найдена")
 
 def change_up_or_down(driver, up_or_down): # Выбор куда ставить вверх или вниз
     try:
@@ -116,4 +122,17 @@ def change_up_or_down(driver, up_or_down): # Выбор куда ставить 
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--put'))).click()
         time.sleep(30)
     except TimeoutException:
-        print("Кнопка времени не найдена")
+        print("Кнопка для выбора куда ставить вверх или вниз не найдено")
+    except ElementClickInterceptedException:
+        print("Кнопка для выбора куда ставить вверх или вниз не найдено")
+
+
+def check_input_is_empty(driver): # Проверяем поле для ввода акций пустая она или нет, если нет, то опустошаем
+    try:
+       input_text = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]'))).get_attribute("value")
+       if input_text == "":
+            return True
+       else:
+            input_text.clear()
+    except TimeoutException:
+        print("Кнопка для ввода акций не найдена")
