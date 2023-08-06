@@ -2,11 +2,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
 from password import param
 import time
 from datetime import datetime
 import socket
 import re
+from selenium.webdriver.common.keys import Keys
 
 def start_program_y(): # Получаем строку из второй программы
     server_address = ('localhost', 14777)  # Укажите адрес и порт, на котором программа Y будет слушать
@@ -63,7 +65,7 @@ def change_active_money(driver, active, time_t): # выбор активов с�
     try:
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
-        input_active.clear()
+        input_active.send_keys(Keys.BACK_SPACE * len(input_active.get_attribute("value")))
         input_active.send_keys(active)
         time.sleep(1)
         if change_long_or_short_active(time_t):
@@ -77,16 +79,22 @@ def change_active_money(driver, active, time_t): # выбор активов с�
 
 def close_banner(driver): # Закрываем баннер с рекламой
     try:
-        WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CLASS_NAME, '--color-light'))).click()
+        WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, '--color-light'))).click()
     except TimeoutException:
+        print("Кнопка для закрытия банера не появилась")
+        pass
+    except NoSuchElementException:
         print("Кнопка для закрытия банера не появилась")
         pass
 
 def close_banner_cookie(driver): # Закрываем баннер с куки
     try:
-        WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, "//button[text()='Хорошо']"))).click()
+        WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//button[text()='Хорошо']"))).click()
     except TimeoutException:
-        print("Кнопка для закрытия банера не появилась")
+        print("Кнопка для закрытия банера cookie не появилась")
+        pass
+    except NoSuchElementException:
+        print("Кнопка для закрытия банера cookie не появилась")
         pass
 
 def change_time(driver, time_t): # Установка времени 

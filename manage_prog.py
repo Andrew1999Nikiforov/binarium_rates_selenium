@@ -13,7 +13,6 @@ def manage_programm_function(driver):
     while True:
         work_site.start_program_y()
         if work_site.text_processing(password.param.text_sms):
-
             work_site.change_active_money(driver, password.param.active, password.param.time)
             work_site.change_time(driver, password.param.time)
             work_site.change_up_or_down(driver, password.param.up_or_down)
