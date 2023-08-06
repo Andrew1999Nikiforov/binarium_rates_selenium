@@ -6,6 +6,7 @@ from password import param
 import time
 from datetime import datetime
 import socket
+import re
 
 def start_program_y(): # Получаем строку из второй программы
     server_address = ('localhost', 14777)  # Укажите адрес и порт, на котором программа Y будет слушать
@@ -15,6 +16,17 @@ def start_program_y(): # Получаем строку из второй про�
         data, address = s.recvfrom(1024)
         param.text_sms = data.decode('utf-8')
         print("Сообщение от программы X:", param.text_sms)
+
+def text_processing(message): # Функция которая обрабатывает строку с канала
+    pattern = r'([A-Za-z]+)\s+(\d{2}:\d{2})\s+(вверх|вниз)'
+    match = re.match(pattern, message)
+    if match:
+        param.active = match.group(1)
+        param.time = match.group(2)
+        param.up_or_down = match.group(3)
+        return True
+    else:
+        return False
 
 def change_real_money_to_game(driver): # Перевод счета с реального на игровой
     try: 
