@@ -3,10 +3,12 @@ import login_site
 import work_site
 import password
 import manage_prog
+import time
 
 def manage_programm_function(driver):
     driver.get(password.param.url)
     login_site.login(driver)
+    time.sleep(60)
     work_site.change_real_money_to_game(driver)
     work_site.close_banner(driver)
     work_site.close_banner_cookie(driver)
