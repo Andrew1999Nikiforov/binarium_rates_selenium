@@ -20,14 +20,23 @@ def start_program_y(): # Получаем строку из второй про�
         param.text_sms = data.decode('utf-8')
         print("Сообщение от программы X:", param.text_sms)
 
+def remove_slash(input_string):
+    return input_string.replace("/", " ")
+
+def add_slash(input_string):
+    return input_string.replace(" ", "/")
+
 def text_processing(message): # Функция которая обрабатывает строку с канала
     # pattern = r'([A-Za-z]+)\s+(\d{2}:\d{2})\s+(вверх|вниз)'
-    pattern = r'^(\w+(?:\s\w+)?)\s(\d{1,2}:\d{2})\s(вверх|вниз)$'
+    pattern = r'([\w\s\(\)]+)\s+((?:вверх|вниз))\s+(\d{2}:\d{2})'
+    message = remove_slash(message)
     match = re.match(pattern, message)
     if match:
         param.active = match.group(1)
-        param.time = match.group(2)
-        param.up_or_down = match.group(3)
+        param.up_or_down = match.group(2)
+        param.time = match.group(3)
+        param.active = add_slash(param.active)
+        print(param.active + "    " + param.up_or_down + "    " + param.time)
         return True
     else:
         return False
@@ -69,7 +78,6 @@ def change_active_money(driver, active, time_t): # выбор активов с�
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
         input_active.send_keys(Keys.BACK_SPACE * len(input_active.get_attribute("value")))
         input_active.send_keys(active)
-        time.sleep(1)
         if change_long_or_short_active(time_t):
             elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
             second_element = elements[1]
@@ -108,19 +116,16 @@ def change_time(driver, time_t): # Установка времени
         text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
         while text_from_time < time_t:
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.t-expiration-spinners .spinners__button.--inc'))).click()
-            time.sleep(1)
             text_from_time = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[a-test="currentExpiration"]'))).get_attribute("title")
     except TimeoutException:
         print("Кнопка для установки времени не найдена")
 
 def change_up_or_down(driver, up_or_down): # Выбор куда ставить вверх или вниз
     try:
-        time.sleep(1)
         if up_or_down == "вверх":
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--call'))).click()
         elif up_or_down == "вниз":
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--put'))).click()
-        time.sleep(30)
     except TimeoutException:
         print("Кнопка для выбора куда ставить вверх или вниз не найдено")
     except ElementClickInterceptedException:
