@@ -1,7 +1,4 @@
 from selenium import webdriver
-import login_site
-import work_site
-import password
 import manage_prog
 
 driver = webdriver.Chrome() 
