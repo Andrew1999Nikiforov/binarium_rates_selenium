@@ -1,8 +1,6 @@
-from selenium import webdriver
 import login_site
 import work_site
 import password
-import manage_prog
 import time
 
 def manage_programm_function(driver):

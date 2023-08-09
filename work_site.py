@@ -1,15 +1,11 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import NoSuchElementException 
-from selenium.common.exceptions import ElementClickInterceptedException
-from password import param
-import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from datetime import datetime
+from password import param
 import socket
 import re
-from selenium.webdriver.common.keys import Keys
 
 def start_program_y(): # Получаем строку из второй программы
     server_address = ('localhost', 14777)  # Укажите адрес и порт, на котором программа Y будет слушать
@@ -72,7 +68,7 @@ def clear_input_text_change_active_money(driver):
         input_active.send_keys(Keys.BACK_SPACE * len(input_active.get_attribute("value")))
         close_active_menu(driver)
     except Exception as e:
-        print(f"Кнопка для выбора % денег не найдена за отведенное время. Ошибка {e}")
+        print(f"Очистка строки для ввода акций не удалась. Ошибка {e}")
         close_active_menu(driver)
 
 def change_active_money(driver, active, time_t): # выбор активов слева сверху
