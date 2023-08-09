@@ -23,5 +23,6 @@ def manage_programm_function(driver):
                 continue
         else:
             continue
+        work_site.clear_input_text_change_active_money(driver)
 
     driver.quit()
