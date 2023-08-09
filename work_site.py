@@ -24,7 +24,7 @@ def add_slash(input_string):
 
 def text_processing(message): # Функция которая обрабатывает строку с канала
     pattern = r'([\w\s\(\)]+)\s+((?:вверх|вниз|ВВЕРХ|ВНИЗ))\s+(\d{2}:\d{2})'
-    message = check_name_active(message)
+    #message = check_name_active(message)
     message = remove_slash(message)
     match = re.match(pattern, message)
     if match:
