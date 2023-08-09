@@ -20,7 +20,7 @@ def start_program_y(): # Получаем строку из второй про�
         param.text_sms = data.decode('utf-8')
         print("Сообщение от программы X:", param.text_sms)
 
-def remove_slash(input_string):
+def remove_slash(input_string): # в Регулярных выражениях убирает знак / и заменяет на пробел
     return input_string.replace("/", " ")
 
 def add_slash(input_string):
@@ -36,7 +36,6 @@ def text_processing(message): # Функция которая обрабатыв
         param.up_or_down = match.group(2)
         param.time = match.group(3)
         param.active = add_slash(param.active)
-        print(param.active + "    " + param.up_or_down + "    " + param.time)
         return True
     else:
         return False
@@ -65,18 +64,24 @@ def change_long_or_short_active(time_sms): # выбор % в активах !!!!
 def close_active_menu(driver): # Закрываем баннер с рекламой
     try:
         WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, '--color-dark'))).click()
-    except TimeoutException:
+    except ( TimeoutException, ElementClickInterceptedException, IndexError, NoSuchElementException ):
         print("Кнопка для закрытия банера актив меню не появилась")
-    except NoSuchElementException:
-        print("Кнопка для закрытия банера актив меню не появилась")
-    except ElementClickInterceptedException:
-        print("Кнопка для закрытия банера актив меню не появилась")
+
+def clear_input_text_change_active_money(driver):
+    try:
+        WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
+        input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
+        input_active.send_keys(Keys.BACK_SPACE * len(input_active.get_attribute("value")))
+        close_active_menu(driver)
+    except ( TimeoutException, ElementClickInterceptedException, IndexError ):
+        print("Кнопка для выбора % денег не найдена за отведенное время.")
+        close_active_menu(driver)
 
 def change_active_money(driver, active, time_t): # выбор активов слева сверху
     try:
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
         input_active = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]')))
-        input_active.send_keys(Keys.BACK_SPACE * len(input_active.get_attribute("value")))
+#        input_active.send_keys(Keys.BACK_SPACE * len(input_active.get_attribute("value")))
         input_active.send_keys(active)
         if change_long_or_short_active(time_t):
             elements = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
@@ -94,22 +99,14 @@ def change_active_money(driver, active, time_t): # выбор активов с�
 def close_banner(driver): # Закрываем баннер с рекламой
     try:
         WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, '--color-light'))).click()
-    except TimeoutException:
+    except (TimeoutException, NoSuchElementException):
         print("Кнопка для закрытия банера не появилась")
-        pass
-    except NoSuchElementException:
-        print("Кнопка для закрытия банера не появилась")
-        pass
 
 def close_banner_cookie(driver): # Закрываем баннер с куки
     try:
         WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//button[text()='Хорошо']"))).click()
-    except TimeoutException:
+    except (TimeoutException, NoSuchElementException):
         print("Кнопка для закрытия банера cookie не появилась")
-        pass
-    except NoSuchElementException:
-        print("Кнопка для закрытия банера cookie не появилась")
-        pass
 
 def change_time(driver, time_t): # Установка времени 
     try:
@@ -126,18 +123,5 @@ def change_up_or_down(driver, up_or_down): # Выбор куда ставить 
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--call'))).click()
         elif up_or_down == "вниз":
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, '--put'))).click()
-    except TimeoutException:
-        print("Кнопка для выбора куда ставить вверх или вниз не найдено")
-    except ElementClickInterceptedException:
-        print("Кнопка для выбора куда ставить вверх или вниз не найдено")
-
-
-def check_input_is_empty(driver): # Проверяем поле для ввода акций пустая она или нет, если нет, то опустошаем
-    try:
-       input_text = WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]'))).get_attribute("value")
-       if input_text == "":
-            return True
-       else:
-            input_text.clear()
-    except TimeoutException:
-        print("Кнопка для ввода акций не найдена")
+    except ( TimeoutException, ElementClickInterceptedException):
+        print("Кнопка для выбора куда ставить вверх или вниз не найдена")
