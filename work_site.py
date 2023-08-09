@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from datetime import datetime
 from password import param
-from password import active
+
 import socket
 import re
 
@@ -35,11 +35,6 @@ def text_processing(message): # Функция которая обрабатыв
         return True
     else:
         return False
-
-def check_name_active(text_without_slash): # Функция которая добавляет знак / в слова из словаря active
-    if text_without_slash in active.active:
-        return(text_without_slash[:3] + '/' + text_without_slash[3:])
-
 
 def change_real_money_to_game(driver): # Перевод счета с реального на игровой
     try: 
