@@ -17,10 +17,10 @@ def start_program_y(): # Получаем строку из второй про�
         param.text_sms = data.decode('utf-8')
 
 def remove_slash(input_string): # в Регулярных выражениях убирает знак / и заменяет на пробел
-    return input_string.replace("/", " ")
+    return input_string.replace("/", "ЪФ")
 
 def add_slash(input_string):
-    return input_string.replace(" ", "/")
+    return input_string.replace("ЪФ", "/")
 
 def text_processing(message): # Функция которая обрабатывает строку с канала
     pattern = r'([\w\s\(\)]+)\s+((?:вверх|вниз|ВВЕРХ|ВНИЗ))\s+(\d{2}:\d{2})'
@@ -86,6 +86,7 @@ def change_active_money(driver, active, time_t): # выбор активов с�
     except Exception as e:
         print(f"Кнопка для выбора % денег не найдена за отведенное время. Ошибка {e}")
         close_active_menu(driver)
+        clear_input_text_change_active_money(driver)
         return False
 
 def close_banner(driver): # Закрываем баннер с рекламой
