@@ -3,10 +3,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from datetime import datetime
-from password import param
+from password import param 
+from password import active
 import socket
 import re
 import time
+
 def start_program_y(): # Получаем строку из второй программы
     server_address = ('localhost', 14777)  # Укажите адрес и порт, на котором программа Y будет слушать
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -15,22 +17,19 @@ def start_program_y(): # Получаем строку из второй про�
         data, address = s.recvfrom(1024)
         param.text_sms = data.decode('utf-8')
 
-def remove_slash(input_string): # в Регулярных выражениях убирает знак / и заменяет на пробел
-    return input_string.replace("/", "error")
-
-def add_slash(input_string):
-    return input_string.replace("error", "/")
+def check_slash_to_name_active(incoming_word):
+    for pair in active.mass_active_name_slash:
+        if pair[0] == incoming_word:
+            param.active = pair[1]
 
 def text_processing(message): # Функция которая обрабатывает строку с канала
-    pattern = r'([\w\s\(\)]+)\s+((?:вверх|вниз|ВВЕРХ|ВНИЗ))\s+(\d{2}:\d{2})'
-    #message = check_name_active(message)
-    message = remove_slash(message)
+    pattern = r'^([A-Za-z\s()]+)\s+(\d+)\s+минут\s+(вверх|вниз|ВВЕРХ|ВНИЗ)$'
     match = re.match(pattern, message)
     if match:
         param.active = match.group(1)
-        param.up_or_down = match.group(2)
-        param.time = match.group(3)
-        param.active = add_slash(param.active)
+        param.time = match.group(2)
+        param.up_or_down = match.group(3)
+        check_slash_to_name_active(param.active)
         return True
     else:
         return False
