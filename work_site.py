@@ -17,22 +17,31 @@ def start_program_y(): # Получаем строку из второй про�
         data, address = s.recvfrom(1024)
         param.text_sms = data.decode('utf-8')
 
-def check_slash_to_name_active(incoming_word):
+def check_slash_to_name_active(incoming_word): # проверка актива на то, имеется ли слэш в его названии например GPB/USD или EUR/USD
     for pair in active.mass_active_name_slash:
         if pair[0] == incoming_word:
             param.active = pair[1]
 
-def text_processing(message): # Функция которая обрабатывает строку с канала
-    pattern = r'^([A-Za-z\s()]+)\s+(\d+)\s+минут\s+(вверх|вниз|ВВЕРХ|ВНИЗ)$'
-    match = re.match(pattern, message)
-    if match:
-        param.active = match.group(1)
-        param.time = match.group(2)
-        param.up_or_down = match.group(3)
+def text_processing(message): # Функция которая обрабатывает строку с канала либо новая ставка либо сигнал о результате
+    pattern1 = r'^([A-Za-z\s()]+)\s+(\d+)\s+минут\s+(вверх|вниз|ВВЕРХ|ВНИЗ)$'
+    pattern2 = r'^([A-Za-z\s()]+)\s+сигнал\s+в\s+(плюс|минус)$'
+    match1 = re.match(pattern1, message)
+    match2 = re.match(pattern2, message)
+    if match1:
+        param.active = match1.group(1)
+        param.time = match1.group(2)
+        param.up_or_down = match1.group(3)
+        param.array2.append(param.active)
         check_slash_to_name_active(param.active)
+        param.count_rate+=1
         return True
-    else:
-        return False
+    elif match2:
+        param.name_signal = match2.group(1)
+        param.result_signal = match2.group(2)
+        param.array_res.append(param.name_signal)
+        param.count_signal+=1
+        return True
+    return False
 
 def change_real_money_to_game(driver): # Перевод счета с реального на игровой
     try: 
