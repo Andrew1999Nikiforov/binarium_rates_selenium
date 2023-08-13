@@ -4,10 +4,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from datetime import datetime
 from password import param
-
 import socket
 import re
-
+import time
 def start_program_y(): # Получаем строку из второй программы
     server_address = ('localhost', 14777)  # Укажите адрес и порт, на котором программа Y будет слушать
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -17,10 +16,10 @@ def start_program_y(): # Получаем строку из второй про�
         param.text_sms = data.decode('utf-8')
 
 def remove_slash(input_string): # в Регулярных выражениях убирает знак / и заменяет на пробел
-    return input_string.replace("/", "ЪФ")
+    return input_string.replace("/", "error")
 
 def add_slash(input_string):
-    return input_string.replace("ЪФ", "/")
+    return input_string.replace("error", "/")
 
 def text_processing(message): # Функция которая обрабатывает строку с канала
     pattern = r'([\w\s\(\)]+)\s+((?:вверх|вниз|ВВЕРХ|ВНИЗ))\s+(\d{2}:\d{2})'
@@ -78,7 +77,13 @@ def change_active_money(driver, active, time_t): # выбор активов с�
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//div[@class="chart-tab__content"]//div[@class="chart-tab__toggle"]'))).click()
         WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Поиск актива"]'))).send_keys(active)
         if change_long_or_short_active(time_t):
-            WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))[1].click()
+            #time.sleep(0.1)
+            check_availability = WebDriverWait(driver, param.timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'asset-profit__score')))
+            #check_availability = driver.find_elements(By.CLASS_NAME, "asset-profit__score")
+            if len(check_availability) == 1:
+                check_availability[0].click()
+            else: 
+                check_availability[1].click()
             return True
         else:
             WebDriverWait(driver, param.timeout).until(EC.presence_of_element_located((By.CLASS_NAME, 'asset-profit__score'))).click()
